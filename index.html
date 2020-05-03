@@ -1,0 +1,287 @@
+<html>
+
+<head>
+    <title>GameOfLife Adder</title>
+    <link href="https://fonts.googleapis.com/css?family=Special+Elite" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">
+    <style>
+        html {
+            background: url(http://whatcreates.com/taxonomyofcells.jpg) no-repeat center center fixed;
+        }
+
+        body {
+            font-family: 'Special Elite', cursive;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .container {
+            display: flex;
+            align-items:baseline;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+            margin-top:30px;
+        }
+
+        #container {
+            width: 200px;
+            padding: 8px 8px 8px 8px;
+            margin: 20px auto;
+            background-color: #ABABAB;
+            border-radius: 4px;
+            border-top: 2px solid #FFF;
+            border-right: 2px solid #FFF;
+            border-bottom: 2px solid #C1C1C1;
+            border-left: 2px solid #C1C1C1;
+            box-shadow: -3px 3px 7px rgba(0, 0, 0, .6), inset -100px 0px 100px rgba(255, 255, 255, .5);
+        }
+
+        #display {
+            display: block;
+            margin: 5px auto;
+            height: 50px;
+            width: 194px;
+            padding: 0 10px;
+            border-radius: 4px;
+            border-top: 2px solid #C1C1C1;
+            border-right: 2px solid #C1C1C1;
+            border-bottom: 2px solid #FFF;
+            border-left: 2px solid #FFF;
+            background-color: #FFF;
+            box-shadow: inset 0px 0px 10px #030303, inset 0px -20px 1px rgba(150, 150, 150, .2);
+            font-size: 26px;
+            color: #666;
+            text-align: right;
+            font-weight: 400;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .button {
+            display: inline-block;
+            margin: 6px;
+            width: 50px;
+            height: 50px;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .mathButtons {
+            margin: 6px 6px 6px 6px;
+            color: #FFF;
+            text-shadow: -1px -1px 0px #44006F;
+            background-color: #434343;
+            border-top: 2px solid #C1C1C1;
+            border-right: 2px solid #C1C1C1;
+            border-bottom: 2px solid #181818;
+            border-left: 2px solid #181818;
+            box-shadow: 0px 0px 2px #030303, inset 0px -20px 1px #2E2E2E;
+        }
+
+        .digits {
+            color: #181818;
+            text-shadow: 1px 1px 0px #FFF;
+            background-color: #EBEBEB;
+            border-top: 2px solid #FFF;
+            border-right: 2px solid #FFF;
+            border-bottom: 2px solid #C1C1C1;
+            border-left: 2px solid #C1C1C1;
+            border-radius: 4px;
+            box-shadow: 0px 0px 2px #030303, inset 0px -20px 1px #DCDCDC;
+        }
+
+        .digits:hover,
+        .mathButtons:hover,
+        #clearButton:hover {
+            background-color: #FFBA75;
+            box-shadow: 0px 0px 2px #FFBA75, inset 0px -20px 1px #FF8000;
+            border-top: 2px solid #FFF;
+            border-right: 2px solid #FFF;
+            border-bottom: 2px solid #AE5700;
+            border-left: 2px solid #AE5700;
+        }
+
+        #clearButton {
+            color: #FFF;
+            text-shadow: -1px -1px 0px #44006F;
+            background-color: #D20000;
+            border-top: 2px solid #FF8484;
+            border-right: 2px solid #FF8484;
+            border-bottom: 2px solid #800000;
+            border-left: 2px solid #800000;
+            box-shadow: 0px 0px 2px #030303, inset 0px -20px 1px #B00000;
+        }
+
+        /* Absolute Center Spinner */
+
+        .loading {
+            position: fixed;
+            z-index: 999;
+            height: 2em;
+            width: 2em;
+            overflow: show;
+            margin: auto;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+        }
+
+        /* Transparent Overlay */
+
+        .loading:before {
+            content: '';
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(rgba(20, 20, 20, .8), rgba(0, 0, 0, .8));
+
+            background: -webkit-radial-gradient(rgba(20, 20, 20, .8), rgba(0, 0, 0, .8));
+        }
+
+        /* :not(:required) hides these rules from IE9 and below */
+
+        .loading:not(:required) {
+            /* hide "loading..." text */
+            font: 0/0 a;
+            color: transparent;
+            text-shadow: none;
+            background-color: transparent;
+            border: 0;
+        }
+
+        .loading:not(:required):after {
+            content: '';
+            display: block;
+            font-size: 10px;
+            width: 1em;
+            height: 1em;
+            margin-top: -0.5em;
+            -webkit-animation: spinner 1500ms infinite linear;
+            -moz-animation: spinner 1500ms infinite linear;
+            -ms-animation: spinner 1500ms infinite linear;
+            -o-animation: spinner 1500ms infinite linear;
+            animation: spinner 1500ms infinite linear;
+            border-radius: 0.5em;
+            -webkit-box-shadow: rgba(255, 255, 255, 0.75) 1.5em 0 0 0, rgba(255, 255, 255, 0.75) 1.1em 1.1em 0 0, rgba(255, 255, 255, 0.75) 0 1.5em 0 0, rgba(255, 255, 255, 0.75) -1.1em 1.1em 0 0, rgba(255, 255, 255, 0.75) -1.5em 0 0 0, rgba(255, 255, 255, 0.75) -1.1em -1.1em 0 0, rgba(255, 255, 255, 0.75) 0 -1.5em 0 0, rgba(255, 255, 255, 0.75) 1.1em -1.1em 0 0;
+            box-shadow: rgba(255, 255, 255, 0.75) 1.5em 0 0 0, rgba(255, 255, 255, 0.75) 1.1em 1.1em 0 0, rgba(255, 255, 255, 0.75) 0 1.5em 0 0, rgba(255, 255, 255, 0.75) -1.1em 1.1em 0 0, rgba(255, 255, 255, 0.75) -1.5em 0 0 0, rgba(255, 255, 255, 0.75) -1.1em -1.1em 0 0, rgba(255, 255, 255, 0.75) 0 -1.5em 0 0, rgba(255, 255, 255, 0.75) 1.1em -1.1em 0 0;
+        }
+
+        /* Animation */
+
+        @-webkit-keyframes spinner {
+            0% {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+                -moz-transform: rotate(360deg);
+                -ms-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                transform: rotate(360deg);
+            }
+        }
+
+        @-moz-keyframes spinner {
+            0% {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+                -moz-transform: rotate(360deg);
+                -ms-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                transform: rotate(360deg);
+            }
+        }
+
+        @-o-keyframes spinner {
+            0% {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+                -moz-transform: rotate(360deg);
+                -ms-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spinner {
+            0% {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+                -moz-transform: rotate(360deg);
+                -ms-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <a href="https://github.com/jayalbo">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+            alt="Fork me on GitHub">
+    </a>
+    <script src="baseGOL.js"></script>
+    <script src="logicGates.js"></script>
+    <h1>Game of Life 8-bit Adder</h1>
+    <p>Simple version of an 8-bit adder using GoLGates.js. HTML/CSS by
+        <a href="https://codepen.io/AndrewCreech">Andrew Creech</a>
+    </p>
+    <div class="container">
+        <fieldset id="container">
+            <form name="calculator">
+                <input id="display" type="text" name="display" readonly>
+
+                <input class="button digits" type="button" value="7" onclick="numberPressed('7')">
+                <input class="button digits" type="button" value="8" onclick="numberPressed('8')">
+                <input class="button digits" type="button" value="9" onclick="numberPressed('9')">
+                <br>
+                <input class="button digits" type="button" value="4" onclick="numberPressed('4')">
+                <input class="button digits" type="button" value="5" onclick="numberPressed('5')">
+                <input class="button digits" type="button" value="6" onclick="numberPressed('6')">
+                <br>
+                <input class="button digits" type="button" value="1" onclick="numberPressed('1')">
+                <input class="button digits" type="button" value="2" onclick="numberPressed('2')">
+                <input class="button digits" type="button" value="3" onclick="numberPressed('3')">
+                <br>
+                <input id="clearButton" class="button" type="button" value="C" onclick="calculator.display.value = ''">
+                <input class="button digits" type="button" value="0" onclick="calculator.display.value += '0'">
+                <input class="button mathButtons" id="operationButton" type="button" value="+" onclick="operate()">
+            </form>
+        </fieldset>
+    </div>
+    <div class="loading" id="loading" style="display:none">Loading&#8230;</div>
+    <script>
+        var newGame = new LOGICGates();
+    </script>
+    <script src="calculator.js"></script>
+</body>
+
+</html>
